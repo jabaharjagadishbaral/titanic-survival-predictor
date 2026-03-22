@@ -1,0 +1,50 @@
+{
+  "overall_survival": 0.4186307519640853,
+  "class_survival": {
+    "1": 0.5972222222222222,
+    "2": 0.42391304347826086,
+    "3": 0.3380855397148676
+  },
+  "sex_survival": {
+    "female": 0.7515151515151515,
+    "male": 0.22281639928698752
+  },
+  "model_accuracy": {
+    "Logistic Regression": 74.3,
+    "Random Forest": 74.3,
+    "Gradient Boosting": 70.95
+  },
+  "feature_importance": {
+    "Pclass": 8.76,
+    "Sex_enc": 33.63,
+    "Age_scaled": 10.3,
+    "Fare_scaled": 12.14,
+    "SibSp": 2.94,
+    "Parch": 1.49,
+    "FamilySize": 2.56,
+    "IsAlone": 0.89,
+    "Embarked_enc": 1.98,
+    "Title_enc": 18.01,
+    "AgeBin_enc": 3.63,
+    "FareBin_enc": 3.68
+  },
+  "age_mean": 29.12828282828283,
+  "age_std": 13.835287779691631,
+  "fare_mean": 36.79203903262092,
+  "fare_std": 44.25899929162719,
+  "lr_coefs": {
+    "Pclass": -0.8179,
+    "Sex_enc": 2.3464,
+    "Age_scaled": -0.2338,
+    "Fare_scaled": 0.0031,
+    "SibSp": 0.0852,
+    "Parch": -0.0781,
+    "FamilySize": 0.0079,
+    "IsAlone": -0.1659,
+    "Embarked_enc": -0.0331,
+    "Title_enc": 0.0381,
+    "AgeBin_enc": -0.0234,
+    "FareBin_enc": -0.0682
+  },
+  "lr_intercept": 0.7813837996995323
+}

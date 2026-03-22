@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Titanic Survival Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0b0f;
+    --surface: #111318;
+    --surface2: #191c24;
+    --surface3: #1f2330;
+    --border: #2a2f3e;
+    --border2: #353c50;
+    --text: #e8eaf0;
+    --text2: #8b91a8;
+    --text3: #5a6075;
+    --gold: #c9a84c;
+    --gold2: #e8c87a;
+    --red: #e05252;
+    --green: #4ecb71;
+    --blue: #5b9cf6;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  h1 span { color: var(--gold); }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--text2);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .layout {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (max-width: 800px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 12px;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  select, input[type="number"] {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 7px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+    width: 100%;
+  }
+
+  select:focus, input[type="number"]:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: var(--surface3);
+  }
+
+  .range-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .range-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .range-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--gold2);
+    font-weight: 600;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--surface3);
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+
+  .btn-predict {
+    width: 100%;
+    padding: 14px;
+    background: var(--gold);
+    color: #0a0b0f;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 24px;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-predict:hover { background: var(--gold2); transform: translateY(-1px); }
+  .btn-predict:active { transform: translateY(0); }
+
+  /* Result panel */
+  .result-panel { position: sticky; top: 20px; }
+
+  .survival-meter {
+    text-align: center;
+    padding: 32px 20px;
+    background: var(--surface2);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .survival-meter::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--border);
+    transition: background 0.5s;
+  }
+
+  .survival-meter.survived::before { background: var(--green); }
+  .survival-meter.died::before { background: var(--red); }
+
+  .survival-label {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+    margin-bottom: 16px;
+  }
+
+  .survival-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    transition: all 0.4s;
+  }
+
+  .survival-verdict {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    transition: color 0.4s;
+  }
+
+  .survival-verdict.survived { color: var(--green); }
+  .survival-verdict.died { color: var(--red); }
+
+  .survival-prob {
+    font-size: 14px;
+    color: var(--text2);
+  }
+
+  .survival-prob strong {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--text);
+    font-size: 18px;
+  }
+
+  /* Probability bar */
+  .prob-bar-wrap {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .prob-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'IBM Plex Mono', monospace;
+    margin-bottom: 8px;
+  }
+
+  .prob-bar {
+    height: 10px;
+    background: var(--surface3);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .prob-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.5s ease, background 0.5s;
+    background: var(--gold);
+  }
+
+  /* Factors */
+  .factors { margin-bottom: 20px; }
+
+  .factor-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .factor-row:last-child { border-bottom: none; }
+
+  .factor-name {
+    flex: 1;
+    color: var(--text2);
+  }
+
+  .factor-bar-wrap {
+    width: 80px;
+    height: 4px;
+    background: var(--surface3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .factor-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s;
+  }
+
+  .factor-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text3);
+    min-width: 32px;
+    text-align: right;
+  }
+
+  /* Stats strip */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .stat-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gold2);
+    margin-bottom: 4px;
+  }
+
+  .stat-lbl {
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* Model compare */
+  .model-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 13px;
+  }
+
+  .model-name { flex: 1; color: var(--text2); }
+  .model-acc {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--gold2);
+    font-size: 13px;
+  }
+
+  .model-bar-bg {
+    width: 70px;
+    height: 4px;
+    background: var(--surface3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .model-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+
+  /* Wave decoration */
+  .wave-sep {
+    text-align: center;
+    color: var(--text3);
+    font-size: 22px;
+    letter-spacing: 6px;
+    margin: 8px 0;
+  }
+
+  .pill {
+    display: inline-block;
+    background: rgba(91,156,246,0.12);
+    color: #7ab3f8;
+    border-radius: 100px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-badge">⚓ ML Classification Project</div>
+  <h1>Titanic <span>Survival</span><br>Predictor</h1>
+  <p class="subtitle">Enter passenger details below. A Logistic Regression model (74.3% accuracy) predicts survival probability based on historical patterns.</p>
+</div>
+
+<div class="layout">
+
+  <!-- LEFT: Form -->
+  <div>
+    <div class="card">
+      <div class="card-title">Passenger Details</div>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Passenger Class</label>
+          <select id="pclass">
+            <option value="1">1st Class — Upper deck</option>
+            <option value="2" selected>2nd Class — Middle deck</option>
+            <option value="3">3rd Class — Steerage</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Sex</label>
+          <select id="sex">
+            <option value="female">Female</option>
+            <option value="male" selected>Male</option>
+          </select>
+        </div>
+
+        <div class="form-group full range-group">
+          <div class="range-header">
+            <label>Age</label>
+            <span class="range-val" id="age-val">29</span>
+          </div>
+          <input type="range" id="age" min="1" max="80" value="29" step="1">
+        </div>
+
+        <div class="form-group">
+          <label>Siblings / Spouses aboard</label>
+          <select id="sibsp">
+            <option value="0" selected>0 — Travelling alone</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4+</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Parents / Children aboard</label>
+          <select id="parch">
+            <option value="0" selected>0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4+</option>
+          </select>
+        </div>
+
+        <div class="form-group full range-group">
+          <div class="range-header">
+            <label>Fare Paid (£)</label>
+            <span class="range-val" id="fare-val">£32</span>
+          </div>
+          <input type="range" id="fare" min="5" max="300" value="32" step="1">
+        </div>
+
+        <div class="form-group">
+          <label>Embarked From</label>
+          <select id="embarked">
+            <option value="S" selected>Southampton (S)</option>
+            <option value="C">Cherbourg (C)</option>
+            <option value="Q">Queenstown (Q)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Title</label>
+          <select id="title">
+            <option value="Mr" selected>Mr</option>
+            <option value="Mrs">Mrs</option>
+            <option value="Miss">Miss</option>
+            <option value="Master">Master</option>
+            <option value="Dr">Dr / Rev</option>
+          </select>
+        </div>
+
+      </div>
+
+      <button class="btn-predict" onclick="predict()">⟶ Predict Survival</button>
+    </div>
+
+    <!-- Model comparison -->
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">Model Accuracy Comparison</div>
+      <div id="model-rows">
+        <div class="model-row">
+          <span class="model-name">Logistic Regression <span class="pill">best</span></span>
+          <div class="model-bar-bg"><div class="model-bar-fill" style="width:74.3%"></div></div>
+          <span class="model-acc">74.3%</span>
+        </div>
+        <div class="model-row">
+          <span class="model-name">Random Forest</span>
+          <div class="model-bar-bg"><div class="model-bar-fill" style="width:74.3%"></div></div>
+          <span class="model-acc">74.3%</span>
+        </div>
+        <div class="model-row">
+          <span class="model-name">Gradient Boosting</span>
+          <div class="model-bar-bg"><div class="model-bar-fill" style="width:70.95%"></div></div>
+          <span class="model-acc">70.9%</span>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; padding-top:16px; border-top: 1px solid var(--border);">
+        <div class="card-title">Feature Importance (Random Forest)</div>
+        <div id="fi-rows"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: Result -->
+  <div class="result-panel">
+
+    <div class="card">
+      <div class="card-title">Prediction Result</div>
+
+      <div class="survival-meter" id="meter">
+        <div class="survival-label">Survival Prediction</div>
+        <div class="survival-icon" id="icon">⚓</div>
+        <div class="survival-verdict" id="verdict">—</div>
+        <div class="survival-prob">Probability: <strong id="prob-text">—</strong></div>
+      </div>
+
+      <div class="prob-bar-wrap">
+        <div class="prob-bar-labels">
+          <span>0% — Certain death</span>
+          <span>100% — Survived</span>
+        </div>
+        <div class="prob-bar">
+          <div class="prob-fill" id="prob-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="card-title" style="margin-top:20px;">Key Survival Factors</div>
+      <div class="factors" id="factors">
+        <div style="color:var(--text3); font-size:13px; text-align:center; padding:16px 0;">
+          Run a prediction to see factor breakdown
+        </div>
+      </div>
+
+      <div class="stats-strip">
+        <div class="stat-box">
+          <div class="stat-val">42%</div>
+          <div class="stat-lbl">Overall survived</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">75%</div>
+          <div class="stat-lbl">Women survived</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">60%</div>
+          <div class="stat-lbl">1st class rate</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- EDA Summary -->
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">Data Insights</div>
+      <div style="font-size:13px; color:var(--text2); line-height:1.7;">
+        <p style="margin-bottom:10px;">The model was trained on <strong style="color:var(--text)">891 passengers</strong> with <strong style="color:var(--text)">12 engineered features</strong> including title extraction, family size, fare binning, and age grouping.</p>
+        <div class="wave-sep">~ ~ ~</div>
+        <p style="margin-top:10px;"><strong style="color:var(--gold)">Sex</strong> is the strongest predictor (33.6% importance), followed by <strong style="color:var(--gold)">Title</strong> (18%), <strong style="color:var(--gold)">Fare</strong> (12.1%), and <strong style="color:var(--gold)">Age</strong> (10.3%).</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const MODEL = {
+    intercept: 0.7813837996995323,
+    coefs: {
+      Pclass: -0.8179, Sex_enc: 2.3464, Age_scaled: -0.2338,
+      Fare_scaled: 0.0031, SibSp: 0.0852, Parch: -0.0781,
+      FamilySize: 0.0079, IsAlone: -0.1659, Embarked_enc: -0.0331,
+      Title_enc: 0.0381, AgeBin_enc: -0.0234, FareBin_enc: -0.0682
+    },
+    age_mean: 29.13, age_std: 13.84, fare_mean: 36.79, fare_std: 44.26
+  };
+
+  const FEATURE_IMPORTANCE = {
+    Sex: 33.63, Title: 18.01, Fare: 12.14, Age: 10.3,
+    Class: 8.76, 'Age Group': 3.68, 'Fare Tier': 3.63,
+    Siblings: 2.94, 'Family Size': 2.56, Embarked: 1.98,
+    Parents: 1.49, 'Is Alone': 0.89
+  };
+
+  const COLORS_FI = ['#c9a84c','#5b9cf6','#4ecb71','#e05252','#9b7fe0',
+                     '#5bc4c9','#e07c52','#52a0e0','#7fe0a0','#e0a052','#e052a0','#a0e052'];
+
+  function buildFI() {
+    const container = document.getElementById('fi-rows');
+    const entries = Object.entries(FEATURE_IMPORTANCE);
+    container.innerHTML = entries.map(([name, val], i) => `
+      <div class="factor-row">
+        <span class="factor-name">${name}</span>
+        <div class="factor-bar-wrap">
+          <div class="factor-bar" style="width:${val/35*100}%;background:${COLORS_FI[i]}"></div>
+        </div>
+        <span class="factor-val">${val.toFixed(1)}%</span>
+      </div>
+    `).join('');
+  }
+
+  function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+
+  function getAgeBin(age) {
+    if (age <= 12) return 0;
+    if (age <= 18) return 1;
+    if (age <= 35) return 2;
+    if (age <= 60) return 3;
+    return 4;
+  }
+
+  function predict() {
+    const pclass    = parseInt(document.getElementById('pclass').value);
+    const sex       = document.getElementById('sex').value;
+    const age       = parseInt(document.getElementById('age').value);
+    const sibsp     = parseInt(document.getElementById('sibsp').value);
+    const parch     = parseInt(document.getElementById('parch').value);
+    const fare      = parseInt(document.getElementById('fare').value);
+    const embarked  = document.getElementById('embarked').value;
+    const title     = document.getElementById('title').value;
+
+    const sex_enc      = sex === 'female' ? 1 : 0;
+    const age_scaled   = (age - MODEL.age_mean) / MODEL.age_std;
+    const fare_scaled  = (fare - MODEL.fare_mean) / MODEL.fare_std;
+    const familySize   = sibsp + parch + 1;
+    const isAlone      = familySize === 1 ? 1 : 0;
+    const embarked_enc = {S:0, C:1, Q:2}[embarked] || 0;
+    const title_enc    = {Mr:0, Mrs:1, Miss:2, Master:3, Dr:4}[title] || 0;
+    const ageBin       = getAgeBin(age);
+    const fareBin      = fare < 14 ? 0 : fare < 26 ? 1 : fare < 55 ? 2 : 3;
+
+    const features = {
+      Pclass: pclass, Sex_enc: sex_enc, Age_scaled: age_scaled,
+      Fare_scaled: fare_scaled, SibSp: sibsp, Parch: parch,
+      FamilySize: familySize, IsAlone: isAlone, Embarked_enc: embarked_enc,
+      Title_enc: title_enc, AgeBin_enc: ageBin, FareBin_enc: fareBin
+    };
+
+    let logit = MODEL.intercept;
+    for (const [k, v] of Object.entries(features)) {
+      logit += MODEL.coefs[k] * v;
+    }
+    const prob = sigmoid(logit);
+    const survived = prob >= 0.5;
+
+    const meter  = document.getElementById('meter');
+    const icon   = document.getElementById('icon');
+    const verdict = document.getElementById('verdict');
+    const probText = document.getElementById('prob-text');
+    const probFill = document.getElementById('prob-fill');
+
+    meter.className = 'survival-meter ' + (survived ? 'survived' : 'died');
+    icon.textContent = survived ? '🛟' : '⚓';
+    verdict.textContent = survived ? 'SURVIVED' : 'DID NOT SURVIVE';
+    verdict.className = 'survival-verdict ' + (survived ? 'survived' : 'died');
+    probText.textContent = (prob * 100).toFixed(1) + '%';
+    probFill.style.width = (prob * 100).toFixed(1) + '%';
+    probFill.style.background = survived ? 'var(--green)' : 'var(--red)';
+
+    renderFactors(features, pclass, sex, age, fare, familySize, prob);
+  }
+
+  function renderFactors(features, pclass, sex, age, fare, familySize, prob) {
+    const factors = [
+      { name: 'Sex',         impact: features.Sex_enc * MODEL.coefs.Sex_enc,       label: sex === 'female' ? 'Female (+)' : 'Male (−)' },
+      { name: 'Passenger class', impact: -((pclass-1) * Math.abs(MODEL.coefs.Pclass)), label: `Class ${pclass}` },
+      { name: 'Fare paid',   impact: features.Fare_scaled * MODEL.coefs.Fare_scaled, label: `£${fare}` },
+      { name: 'Age',         impact: features.Age_scaled * MODEL.coefs.Age_scaled,  label: `${age} yrs` },
+      { name: 'Family size', impact: (familySize > 1 ? 0.15 : -0.17),              label: `${familySize} total` },
+    ];
+
+    const maxAbs = Math.max(...factors.map(f => Math.abs(f.impact)));
+    const container = document.getElementById('factors');
+
+    container.innerHTML = factors.map(f => {
+      const pct = Math.min(100, Math.abs(f.impact) / (maxAbs || 1) * 100);
+      const color = f.impact >= 0 ? 'var(--green)' : 'var(--red)';
+      const sign = f.impact >= 0 ? '▲' : '▼';
+      return `
+        <div class="factor-row">
+          <span class="factor-name">${f.name}</span>
+          <div class="factor-bar-wrap">
+            <div class="factor-bar" style="width:${pct.toFixed(0)}%;background:${color}"></div>
+          </div>
+          <span class="factor-val" style="color:${color}">${sign}</span>
+          <span style="font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;">${f.label}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('age').addEventListener('input', function() {
+    document.getElementById('age-val').textContent = this.value;
+  });
+
+  document.getElementById('fare').addEventListener('input', function() {
+    document.getElementById('fare-val').textContent = '£' + this.value;
+  });
+
+  buildFI();
+  predict();
+</script>
+</body>
+</html>
