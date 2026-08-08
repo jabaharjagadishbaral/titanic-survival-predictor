@@ -1,1 +1,1 @@
-Titanic
+Titanic Survival Predictor
